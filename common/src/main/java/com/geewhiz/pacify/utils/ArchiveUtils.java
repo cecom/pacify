@@ -51,8 +51,8 @@ import com.geewhiz.pacify.model.PFile;
 import com.geewhiz.pacify.model.utils.ModelUtils;
 
 public class ArchiveUtils {
-
-    public static boolean isArchiveAndIsSupported(String archiveName) {
+	
+	public static boolean isArchiveAndIsSupported(String archiveName) {
         String type = getArchiveType(archiveName);
 
         if ("jar".equalsIgnoreCase(type)) {
@@ -248,12 +248,13 @@ public class ArchiveUtils {
             manifest.delete();
         }
 
-        if (!archive.delete()) {
-            throw new RuntimeException("Couldn't delete file [" + archive.getPath() + "]... Aborting!");
-        }
-        if (!tmpArchive.renameTo(archive)) {
-            throw new RuntimeException("Couldn't rename filtered file from [" + tmpArchive.getPath() + "] to [" + archive.getPath() + "]... Aborting!");
-        }
+        FileUtils.deleteFile(archive);
+        
+        try {
+			org.apache.commons.io.FileUtils.moveFile(tmpArchive, archive);
+		} catch (IOException e) {
+			throw new RuntimeException("Couldn't rename filtered file from [" + tmpArchive.getPath() + "] to [" + archive.getPath() + "]... Aborting!", e);
+		}
     }
 
     ////////////////////////////// PRIVAT Stuff

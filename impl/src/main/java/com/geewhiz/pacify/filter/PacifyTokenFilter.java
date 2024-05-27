@@ -58,13 +58,15 @@ public class PacifyTokenFilter implements PacifyFilter {
 
 			FileUtils.setPosixPermissions(FileUtils.getPosixPermissions(fileToFilter), tmpFile);
 
-			if (!fileToFilter.delete()) {
-				throw new RuntimeException("Couldn't delete file [" + fileToFilter.getPath() + "]... Aborting!");
-			}
-			if (!tmpFile.renameTo(fileToFilter)) {
-				throw new RuntimeException("Couldn't rename filtered file from [" + tmpFile.getPath() + "] to [" + fileToFilter.getPath() + "]... Aborting!");
-			}
-
+			
+			FileUtils.deleteFile(fileToFilter);
+            
+            try {
+    			org.apache.commons.io.FileUtils.moveFile(tmpFile, fileToFilter);
+    		} catch (IOException e) {
+    			throw new RuntimeException("Couldn't rename filtered file from [" + tmpFile.getPath() + "] to [" + fileToFilter.getPath() + "]... Aborting!", e);
+    		}
+			
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
