@@ -8,7 +8,7 @@
     <!-- sollte der Workspace verändert sein, gibt es einen DIRTY Flag -->
     <useDirty>true</useDirty>
     <!-- es wird noch der SHA1 mit im Build aufgenommen -->
-    <useGitCommitId>true</useGitCommitId>
+    <useGitCommitId>false</useGitCommitId>
     <!-- nur 8 Zeichen des SHA1 -->
     <gitCommitIdLength>8</gitCommitIdLength>
     <!-- diese Branches werden nicht separat am Tag namen angehogen. -->
