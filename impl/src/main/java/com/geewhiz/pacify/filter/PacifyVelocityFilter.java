@@ -43,7 +43,7 @@ public class PacifyVelocityFilter implements PacifyFilter {
 
     private static final String BEGIN_TOKEN = "${";
     private static final String END_TOKEN   = "}";
-
+    
     @Override
     public LinkedHashSet<Defect> filter(PFile pFile, Map<String, String> propertyValues) {
         LinkedHashSet<Defect> defects = new LinkedHashSet<Defect>();
@@ -71,12 +71,15 @@ public class PacifyVelocityFilter implements PacifyFilter {
             FileWriterWithEncoding fw = new FileWriterWithEncoding(tmpFile, pFile.getEncoding());
             template.merge(context, fw);
             fw.close();
-            if (!fileToFilter.delete()) {
-                throw new RuntimeException("Couldn't delete file [" + fileToFilter.getPath() + "]... Aborting!");
-            }
-            if (!tmpFile.renameTo(fileToFilter)) {
-                throw new RuntimeException("Couldn't rename filtered file from [" + tmpFile.getPath() + "] to [" + fileToFilter.getPath() + "]... Aborting!");
-            }
+            
+            FileUtils.deleteFile(fileToFilter);
+            
+            try {
+    			org.apache.commons.io.FileUtils.moveFile(tmpFile, fileToFilter);
+    		} catch (IOException e) {
+    			throw new RuntimeException("Couldn't rename filtered file from [" + tmpFile.getPath() + "] to [" + fileToFilter.getPath() + "]... Aborting!", e);
+    		}
+            
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

@@ -39,9 +39,13 @@ import java.util.regex.Pattern;
 import org.apache.commons.io.Charsets;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class FileUtils {
 
+	private static Logger logger = LogManager.getLogger(FileUtils.class.getName());
+	
 	private static final boolean IS_POSIX = FileSystems.getDefault().supportedFileAttributeViews().contains("posix");
 
 	public static List<String> getFileAsLines(URL fileURL, String encoding) {
@@ -152,5 +156,23 @@ public class FileUtils {
 		for (String child : source.list()) {
 			copyDirectory(new File(source, child), new File(target, child));
 		}
+	}
+	
+	public static void deleteFile(File fileToDelete) {
+		if (!fileToDelete.delete()) {
+            throw new RuntimeException("Couldn't delete file [" + fileToDelete.getPath() + "]... Aborting!");
+        }
+        
+        int waitMax=0;
+        while(fileToDelete.exists()) {
+        	if (waitMax == 20) {
+        	   throw new RuntimeException("File not removed [" + fileToDelete.getPath() + "] ... Aborting!");
+        	}
+        	
+        	logger.debug("File should be deleted. Waiting for fs [" + fileToDelete.getPath() + "] to complete and try again.");	
+        	Utils.sleep(10);
+        	waitMax++;
+        }
+		
 	}
 }
